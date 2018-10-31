@@ -1,0 +1,49 @@
+---
+
+- set_fact:
+    project_root: "{{web_root}}/{{project.domain | default(project.name)}}"
+
+- name: "download {{project.name}} from git"
+  git:
+    repo: "{{project.repo}}"
+    dest: "{{project_root}}"
+    clone: yes
+    update: no
+  register: cloned_repo_result
+  become: yes
+  become_user: "{{web_user}}"
+
+- name: composer install dependensy
+  composer:
+    executable: "{{php_cli}}"
+    working_dir: "{{project_root}}"
+    command: "{{project.composer.command | default('install')}}"
+    no_dev: "{{project.composer.no_dev | default('yes')}}"
+    prefer_dist: "{{project.composer.prefer_dist | default('yes')}}"
+    prefer_source: "{{project.composer.prefer_source | default('no')}}"
+    optimize_autoloader: "{{project.composer.optimize_autoloader | default('yes')}}"
+  when: cloned_repo_result.changed
+  become: yes
+  become_user: "{{web_user}}"
+  ignore_errors: yes
+
+- name: "set mods project {{project.name}} dir"
+  file:
+    path: "{{project_root}}"
+    state: directory
+    mode: 0750
+    owner: "{{web_user}}"
+    group: "{{web_group}}"
+  become: yes
+  when: cloned_repo_result.changed
+
+- name: "generate nginx config for {{project.name}} on domain {{project.domain | default (project.name)}}"
+  template:
+    src: project.site.j2
+    dest: "/etc/nginx/sites/{{project.name}}.site"
+    owner: root
+    group: root
+    mode: '0644'
+    force: no
+  become: yes
+  notify: nginx reload

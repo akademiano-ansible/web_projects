@@ -1,0 +1,8 @@
+---
+# tasks file for mrdatamapper.akademiano_projects
+
+- include_tasks: "project.yml"
+  loop: "{{web_projects}}"
+  loop_control:
+    loop_var: project
+

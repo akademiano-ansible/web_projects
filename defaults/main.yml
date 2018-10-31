@@ -1,0 +1,8 @@
+---
+# defaults file for mrdatamapper.akademiano_web_projects
+
+web_root: /var/www
+
+web_user:  webdev
+
+web_group: www-data

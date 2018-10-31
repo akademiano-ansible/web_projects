@@ -1,0 +1,8 @@
+server {
+  server_name {{project.domain | default (project.name)}};
+  userid_domain {{project.domain | default (project.name)}};
+  set $server_real_name $server_name;
+  include conf.sites.d/standart-site;
+  access_log /var/log/nginx/{{project.domain | default (project.name)}}.access.log extlog;
+  error_log /var/log/nginx/{{project.domain | default (project.name)}}.error.log;
+}
