@@ -1,6 +1,12 @@
 ---
 # tasks file for mrdatamapper.akademiano_projects
 
+#- name: set ssh deploy key for download
+#  copy:
+#    content: "{{ mycert }}"
+#    dest: ~/ssh/
+
+
 - include_tasks: "project.yml"
   loop: "{{web_projects}}"
   loop_control:
